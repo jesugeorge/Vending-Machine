@@ -25,24 +25,36 @@ public class VendingMachine {
         coinInventory.put(denomination, quantity);
     }
 
-    public void buyProduct(String product, int amount) {
-        if (inventory.containsKey(product)) {
-            int price = inventory.get(product);
-            if (amount >= price) {
-                int change = amount - price;
-                if (hasSufficientChange(change)) {
-                    inventory.put(product, inventory.get(product) - 1);
-                    giveChange(change);
-                    System.out.println("Enjoy your " + product + "!");
-                } else {
-                    System.out.println("Sorry, not enough change available. Transaction canceled.");
-                }
+    public void buyProducts(Map<String, Integer> selectedProducts, int amount) {
+        int totalCost = calculateTotalCost(selectedProducts);
+
+        if (amount >= totalCost) {
+            int change = amount - totalCost;
+
+            if (hasSufficientChange(change)) {
+                processTransaction(selectedProducts);
+                giveChange(change);
+                System.out.println("Transaction completed. Enjoy your products!");
             } else {
-                System.out.println("Not enough money to buy " + product);
+                System.out.println("Sorry, not enough change available. Transaction canceled.");
             }
         } else {
-            System.out.println("Product not available");
+            System.out.println("Not enough money to buy selected products.");
         }
+    }
+
+    private int calculateTotalCost(Map<String, Integer> selectedProducts) {
+        int totalCost = 0;
+        for (Map.Entry<String, Integer> entry : selectedProducts.entrySet()) {
+            String product = entry.getKey();
+            int quantity = entry.getValue();
+            if (inventory.containsKey(product)) {
+                totalCost += inventory.get(product) * quantity;
+            } else {
+                System.out.println("Product not available: " + product);
+            }
+        }
+        return totalCost;
     }
 
     private boolean hasSufficientChange(int change) {
@@ -53,6 +65,16 @@ public class VendingMachine {
             }
         }
         return change == 0;
+    }
+
+    private void processTransaction(Map<String, Integer> selectedProducts) {
+        for (Map.Entry<String, Integer> entry : selectedProducts.entrySet()) {
+            String product = entry.getKey();
+            int quantity = entry.getValue();
+            if (inventory.containsKey(product)) {
+                inventory.put(product, inventory.get(product) - quantity);
+            }
+        }
     }
 
     private void giveChange(int change) {
@@ -68,7 +90,6 @@ public class VendingMachine {
     }
 
     public static void main(String[] args) {
-        // Initialize vending machine with inventory and coin float
         Map<String, Integer> initialInventory = new HashMap<>();
         initialInventory.put("Coke", 10);
         initialInventory.put("Pepsi", 15);
@@ -84,9 +105,15 @@ public class VendingMachine {
 
         VendingMachine vendingMachine = new VendingMachine(initialInventory, initialCoins);
 
-        // Sample usage
+        // Sample usage with multiple products
         vendingMachine.displayInventory();
-        vendingMachine.buyProduct("Coke", 25);
+
+        Map<String, Integer> selectedProducts = new HashMap<>();
+        selectedProducts.put("Coke", 2);
+        selectedProducts.put("Pepsi", 1);
+
+        vendingMachine.buyProducts(selectedProducts, 75);
+
         vendingMachine.displayInventory();
     }
 }

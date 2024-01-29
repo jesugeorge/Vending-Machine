@@ -1,14 +1,25 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Test {
     public static void main(String[] args) {
-        // Test vending machine functionality
-        testVendingMachine();
+        // Initial setup
+        VendingMachine vendingMachine = createSampleVendingMachine();
+
+        // Display initial inventory
+        vendingMachine.displayInventory();
+
+        // Test buying multiple products
+        Map<String, Integer> selectedProducts = new HashMap<>();
+        selectedProducts.put("Coke", 2);
+        selectedProducts.put("Pepsi", 1);
+
+        vendingMachine.buyProducts(selectedProducts, 75);
+
+        // Display updated inventory
+        vendingMachine.displayInventory();
     }
 
-    private static void testVendingMachine() {
-        // Initialize vending machine with inventory and coin float
+    private static VendingMachine createSampleVendingMachine() {
         Map<String, Integer> initialInventory = new HashMap<>();
         initialInventory.put("Coke", 10);
         initialInventory.put("Pepsi", 15);
@@ -22,24 +33,6 @@ public class Test {
         initialCoins.put(50, 10);
         initialCoins.put(100, 10);
 
-        VendingMachine vendingMachine = new VendingMachine(initialInventory, initialCoins);
-
-        // Test buying a product
-        System.out.println("Test 1: Buying a product with exact change");
-        vendingMachine.buyProduct("Coke", 25);
-        vendingMachine.displayInventory();
-        System.out.println();
-
-        // Test buying a product with insufficient change
-        System.out.println("Test 2: Buying a product with insufficient change");
-        vendingMachine.buyProduct("Pepsi", 10);
-        vendingMachine.displayInventory();
-        System.out.println();
-
-        // Test buying a product with excess change
-        System.out.println("Test 3: Buying a product with excess change");
-        vendingMachine.buyProduct("Sprite", 50);
-        vendingMachine.displayInventory();
-        System.out.println();
+        return new VendingMachine(initialInventory, initialCoins);
     }
 }
